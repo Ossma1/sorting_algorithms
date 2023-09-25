@@ -1,58 +1,92 @@
 #include "sort.h"
 
 /**
- * swap_nodes - Swap 2 nodes in a listint_t doubly-linked .
- * @ins: A pointer to the head of the doubly-linked .
- * @lis_n: A pointer to the 1 node to swap.
- * @lis_n2: The 2 node to swap.
+ * swap_nodes - Swap two nodes in a listint_t doubly-linked list.
+ * @h: A pointer to the head of the doubly-linked list.
+ * @n1: A pointer to the first node to swap.
+ * @n2: The second node to swap.
  */
-void swap_nodes(listint_t **ins, listint_t **lis_n, listint_t *lis_n2)
+void swap_nodes(listint_t **h, listint_t **n1, listint_t *n2)
 {
-    if (*lis_n == NULL || lis_n2 == NULL)
+    if (*n1 == NULL || n2 == NULL)
         return;
 
-    listint_t *temp_next = lis_n2->next;
-    listint_t *temp_prev = lis_n2->prev;
+    listint_t *n1_prev = (*n1)->prev;
+    listint_t *n1_next = (*n1)->next;
+    listint_t *n2_prev = n2->prev;
+    listint_t *n2_next = n2->next;
 
-    lis_n2->next = (*lis_n)->next;
-    lis_n2->prev = *lis_n;
-
-    if ((*lis_n)->next != NULL)
-        (*lis_n)->next->prev = lis_n2;
-
-    if ((*lis_n)->prev != NULL)
-        (*lis_n)->prev->next = lis_n2;
+    if (n1_prev != NULL)
+        n1_prev->next = n2;
     else
-        *ins = lis_n2;
+        *h = n2;
 
-    (*lis_n)->next = temp_next;
-    if (temp_next != NULL)
-        temp_next->prev = *lis_n;
+    if (n1_next != NULL)
+        n1_next->prev = n2;
 
-    *lis_n = temp_prev;
+    n2->prev = n1_prev;
+    n2->next = n1_next;
+
+    if (n2_prev != NULL)
+        n2_prev->next = *n1;
+
+    if (n2_next != NULL)
+        n2_next->prev = *n1;
+
+    (*n1)->prev = n2_prev;
+    (*n1)->next = n2_next;
+    *n1 = n2;
 }
 /**
- * insertion_sort_list - Sorts a doubly linked list  
+ * insertion_sort_list - Sorts a doubly linked list of integers
  *                       using the insertion sort algorithm.
  * @list: A pointer to the head of a doubly-linked list of integers.
  *
  * Description: Prints the list after each swap.
  */
-void insertion_sort_list(listint_t **listaa)
+void insertion_sort_list(listint_t **list)
 {
-	listint_t *iter, *insert, *tmp;
-
-	if (listaa == NULL || *listaa == NULL || (*listaa)->next == NULL)
+	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
 
-	for (iter = (*listaa)->next; iter != NULL; iter = tmp)
+	listint_t *sorted = NULL;  // La liste triée commence vide
+	listint_t *current = *list;  // Nœud en cours de traitement
+
+	while (current != NULL)
 	{
-		tmp = iter->next;
-		insert = iter->prev;
-		while (insert != NULL && iter->n < insert->n)
+		listint_t *next = current->next;  // Nœud suivant
+
+		// Insérer current dans la liste triée
+		if (sorted == NULL || current->n < sorted->n)
 		{
-			swap_nodes(listaa, &insert, iter);
-			print_list((const listint_t *)*listaa);
+			current->next = sorted;
+			current->prev = NULL;
+
+			if (sorted != NULL)
+				sorted->prev = current;
+
+			sorted = current;
 		}
+		else
+		{
+			listint_t *temp = sorted;
+
+			while (temp->next != NULL && temp->next->n < current->n)
+			{
+				temp = temp->next;
+			}
+
+			current->next = temp->next;
+
+			if (temp->next != NULL)
+				temp->next->prev = current;
+
+			temp->next = current;
+			current->prev = temp;
+		}
+
+		current = next;
 	}
+
+	*list = sorted;  // Met à jour la liste originale
 }
