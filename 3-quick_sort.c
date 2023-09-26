@@ -7,17 +7,18 @@ void quick_sort(int *array, size_t size);
 
 /**
  * swap_ints - Swap two integers in an array.
- * @a: The first integer to swap.
- * @b: The second integer to swap.
+ * @k: The first integer to swap.
+ * @l: The second integer to swap.
  */
-void swap_ints(int *a, int *b)
+void swap_ints(int *k, int *l)
 {
-	int tmp;
+	int t;
 
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
+	t = *k;
+	*k = *l;
+	*l = t;
 }
+
 
 /**
  * lomuto_partition - Order a subset of an array of integers according to
@@ -36,7 +37,7 @@ int lomuto_partition(int *array, size_t size, int left, int right)
 	pivot = array + right;
 	for (above = below = left; below < right; below++)
 	{
-		if (array[below] < *pivot)
+		if (array[below] < *(array + right))
 		{
 			if (above < below)
 			{
@@ -47,9 +48,9 @@ int lomuto_partition(int *array, size_t size, int left, int right)
 		}
 	}
 
-	if (array[above] > *pivot)
+	if (array[above] > *(array + right))
 	{
-		swap_ints(array + above, pivot);
+		swap_ints(array + above, (array + right));
 		print_array(array, size);
 	}
 
@@ -88,8 +89,10 @@ void lomuto_sort(int *array, size_t size, int left, int right)
  */
 void quick_sort(int *array, size_t size)
 {
-	if (array == NULL || size < 2)
+	if (array == NULL)
 		return;
+    if(size < 2)
+        return;
 
 	lomuto_sort(array, size, 0, size - 1);
 }
